@@ -1,0 +1,152 @@
+{% extends 'main.html' %} {% block content %}
+
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div onclick="$('#addUserModal').modal('show')" class="d-sm-flex align-departments-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            Department Table
+        </h1>
+        <button class="btn btn-primary" onclick="$('#addDepartmentsModal').modal('show')">Add Department</button>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Area Chart -->
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-departments-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Department List</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body table-responsive ">
+                    <table id="" class="table table-bordered data-table">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Department</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in departments %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.desc }}</td>
+                                <td>{{ item.qty }}</td>
+                                <td>
+                                    {% comment %} <button type="button" class="btn btn-primary"
+                                        onclick="addDepartmentToProduction({{ item.id }}, 'http:\/\/127.0.0.1:8000/getDepartments')">
+                                        Add to production
+                                    </button> {% endcomment %}
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#editDepartmentsModal"
+                                        onclick="editDepartment({{ item.id }}, 'http:\/\/127.0.0.1:8000/getDepartments')"><i
+                                            class="fa fa-pen"></i> </button>
+                                    <button onclick="deleteDepartment({{ item.id }}, 'http:\/\/127.0.0.1:8000/deleteDepartment')"
+                                        type="button" class="btn btn-danger"><i class="fa fa-trash"></i> </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Department to Production</h1>
+            </div>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="itemId_" name="itemId_" />
+                    <label for="">Enter the Quantity for <span id="item_name"></span></label>
+
+                    <input type="number" id="itemQuantity" max="" min="1" value="1" class="form-control"
+                        name="itemQuantity" />
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#staticBackdrop').modal('hide')" type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <input type="submit" class="btn btn-primary" value="Add" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addDepartmentsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="addDepartmentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addDepartmentsModalLabel">Add Department</h1>
+            </div>
+            <form action="/saveDepartment" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="">Department Name</label>
+                            <input type="text" id="departmentName" placeholder="Department Name" class="form-control"
+                                name="departmentName" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#addDepartmentsModal').modal('hide')" type="button" class="btn btn-secondary">
+                        Close
+                    </button>
+                    <input type="submit" onclick="addDepartment()" class="btn btn-primary" value="Save" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editDepartmentsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="editDepartmentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editDepartmentsModalLabel">Edit Department</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/updateDepartment" method="POST">
+                <input type="hidden" name="editId" id="editId">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="">Department Name</label>
+                            <input type="text" id="editDepartmentName" placeholder="Department Name" class="form-control"
+                                name="editDepartmentName" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="$('#editDepartmentsModal').modal('hide')">
+                        Close
+                    </button>
+                    <input type="submit" class="btn btn-primary" value="Update" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

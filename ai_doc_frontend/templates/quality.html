@@ -1,0 +1,102 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            Quality Assuarance Table
+        </h1>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Area Chart -->
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Quality Assuarance Table</h6>
+
+                </div>
+                <!-- Card Body -->
+                <div class="card-body table-responsive ">
+                    <table class="table table-bordered data-table">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Production ID</th>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in qa_data %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td>{{ data.dateTime|date:"Y-m-d" }}</td>
+                                <td>{{ data.p_id }}</td>
+                                <td>{{ data.name }}</td>
+                                <td>{{ data.qty }}</td>
+                                {% if forloop.first %}
+                                <td>Under Quality Check</td>
+                                <td>
+                                    <button type="button" class="btn btn-success"
+                                        onclick="getQAData({{ data.id }}, {{ data.qty }})">Complete QA</button>
+                                </td>
+                                {% else %}
+                                <td>Pending</td>
+                                <td><i>No Action</i></td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="completeQA" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="completeQALabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="completeQALabel">Complete QA</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row text-center"><span class="d-none text-danger" id="qty-error"></span></div>
+                    <div class="row">
+                        <input type="hidden" id="qaID" name="qaID">
+                        <input type="hidden" id="tot_qty" name="tot_qty">
+                        <div class="col-6">
+                            <label for="">Approved Quantity</label>
+                            <input oninput='checkQty()' onchange="checkQty()" type="number" id="approvedQuantityInsert"
+                                min="0" value="0" class="form-control" name="approvedQuantityInsert" />
+                        </div>
+                        <div class="col-6">
+                            <label for="">Rejected Quantity</label>
+                            <input oninput='checkQty()' onchange="checkQty()" type="number" id="rejectedQuantityInsert"
+                                min="0" value="0" class="form-control" name="rejectedQuantityInsert" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="$('#completeQA').modal('hide')">
+                        Close
+                    </button>
+                    <input id="final" type="submit" class="btn btn-primary" value="Add" disabled />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,66 @@
+{% extends 'main.html' %} {% block content %}
+
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div onclick="$('#addUserModal').modal('show')" class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            Production Table
+        </h1>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Area Chart -->
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Production List</h6>
+
+                </div>
+                <!-- Card Body -->
+                <div class="card-body table-responsive ">
+                    <table id="" class="table table-bordered data-table">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Production ID</th>
+                                <th>Production</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Status</th>
+                                <th>Action</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p_item in productionData %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td>{{ p_item.dateTime|date:"Y-m-d" }}</td>
+                                <td>{{ p_item.p_id }}</td>
+                                <td>{{ p_item.name }}</td>
+                                <td>{{ p_item.desc }}</td>
+                                <td>{{ p_item.qty }}</td>
+                                {% if forloop.first %}
+                                <td>Under Production</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#staticBackdrop"
+                                        onclick="addToQA({{ p_item.id }}, 'http:\/\/127.0.0.1:8000/add_to_QA')">Send To
+                                        QA</button>
+                                </td>
+                                {% else %}
+                                <td>Pending</td>
+                                <td><i>No Action</i></td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

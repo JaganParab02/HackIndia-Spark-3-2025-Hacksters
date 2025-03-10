@@ -1,0 +1,178 @@
+{% extends 'main.html' %} {% block content %}
+
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div onclick="$('#addUserModal').modal('show')" class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            Item Table
+        </h1>
+        <button class="btn btn-primary" onclick="$('#addItemsModal').modal('show')">Add Item</button>
+
+    </div>
+
+
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <!-- Area Chart -->
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Item List</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body table-responsive ">
+                    <table id="" class="table table-bordered data-table">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.desc }}</td>
+                                <td>{{ item.qty }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="addItemToProduction({{ item.id }}, 'http:\/\/127.0.0.1:8000/getItems')">
+                                        Add to production
+                                    </button>
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#editItemsModal"
+                                        onclick="editItem({{ item.id }}, 'http:\/\/127.0.0.1:8000/getItems')"><i
+                                            class="fa fa-pen"></i> </button>
+                                    <button onclick="deleteItem({{ item.id }}, 'http:\/\/127.0.0.1:8000/deleteItem')"
+                                        type="button" class="btn btn-danger"><i class="fa fa-trash"></i> </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Item to Production</h1>
+            </div>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="itemId_" name="itemId_" />
+                    <label for="">Enter the Quantity for <span id="item_name"></span></label>
+
+                    <input type="number" id="itemQuantity" max="" min="1" value="1" class="form-control"
+                        name="itemQuantity" />
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#staticBackdrop').modal('hide')" type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <input type="submit" class="btn btn-primary" value="Add" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addItemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="addItemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addItemsModalLabel">Add Item</h1>
+            </div>
+            <form action="/saveItems" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="">Item Name</label>
+                            <input type="text" id="itemName" placeholder="Item Name" class="form-control"
+                                name="itemName" />
+                        </div>
+                        <div class="col-6">
+                            <label for="">Item Desc</label>
+                            <textarea class="form-control" name="itemDesc" id="itemDesc"
+                                placeholder="Item Description...."></textarea>
+                        </div>
+                        <div class="col-6">
+                            <label for="">Item Quantity</label>
+                            <input type="number" id="itemQuantityInsert" min="0" value="0" class="form-control"
+                                name="itemQuantityInsert" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#addItemsModal').modal('hide')" type="button" class="btn btn-secondary">
+                        Close
+                    </button>
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editItemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="editItemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editItemsModalLabel">Edit Item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/updateItem" method="POST">
+                <input type="hidden" name="editId" id="editId">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="">Item Name</label>
+                            <input type="text" id="editItemName" placeholder="Item Name" class="form-control"
+                                name="editItemName" />
+                        </div>
+                        <div class="col-6">
+                            <label for="">Item Desc</label>
+                            <textarea class="form-control" name="editItemDesc" id="editItemDesc"
+                                placeholder="Item Description...."></textarea>
+                        </div>
+                        <div class="col-6">
+                            <label for="">Item Quantity</label>
+                            <input type="number" id="editItemQuantityInsert" min="0" value="0" class="form-control"
+                                name="editItemQuantityInsert" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="$('#editItemsModal').modal('hide')">
+                        Close
+                    </button>
+                    <input type="submit" class="btn btn-primary" value="Update" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
